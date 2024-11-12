@@ -1,13 +1,15 @@
-import mongoose from "mongoose";
+// 🔥🔥 As this code is optional for now so let it be commented
 
-const referencesSchema = new mongoose.Schema({
-  messageId:{
-    type:mongoose.Schema.Types.ObjectId,
-    ref:"Message"
-  },
-  fileUrl:{
-    type:String
-  }
-},{timestamps:true});
+// import mongoose from "mongoose";
 
-export const References=mongoose.model("References",referencesSchema);
+// const referencesSchema = new mongoose.Schema({
+//   messageId:{
+//     type:mongoose.Schema.Types.ObjectId,
+//     ref:"Message"
+//   },
+//   fileUrl:{
+//     type:String
+//   }
+// },{timestamps:true});
+
+// export const References=mongoose.model("References",referencesSchema);
