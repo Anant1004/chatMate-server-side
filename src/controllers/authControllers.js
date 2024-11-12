@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { User } from '../models/user.model.js'; 
+import User from '../models/userModel.js'; 
 const JWT_SECRET = process.env.JWT_SECRET
 
 const signupUser = async (req, res) => {
@@ -37,7 +37,6 @@ const signupUser = async (req, res) => {
         res.status(500).json({ message: 'Server error sign-up' });
     }
 };
-
 
 const loginUser = async (req, res) => {
     try {
