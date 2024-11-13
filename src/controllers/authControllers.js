@@ -3,14 +3,18 @@ import jwt from 'jsonwebtoken';
 import User from '../models/userModel.js'; 
 const JWT_SECRET = process.env.JWT_SECRET
 
+
 const signupUser = async (req, res) => {
     try {
-        const { fullName, userName, email, password, avatar } = req.body;        
+        const { fullName, userName, email, password, avatar } = req.body;
+        if (!fullName || !userName || !email || !password) {
+            return res.status(400).json({ message: 'All fields are required.' });
+        }
         const existingUser = await User.findOne({ $or: [{ email }, { userName }] });
         if (existingUser) {
             return res.status(400).json({ message: 'User already exists.' });
-        }
-        const hashedPassword = await bcrypt.hash(password, 12);        
+        }      
+        const hashedPassword = await bcrypt.hash(password, 12);
         const newUser = new User({
             fullName,
             userName,
@@ -20,7 +24,7 @@ const signupUser = async (req, res) => {
             status: false,
             friends: []
         });
-        await newUser.save();        
+        await newUser.save();  
         res.status(201).json({
             _id: newUser._id,
             fullName: newUser.fullName,
@@ -45,16 +49,20 @@ const loginUser = async (req, res) => {
         if (!user) {
             return res.status(400).json({ message: 'Invalid email or password' });
         }
-        const isPasswordValid = await bcrypt.compare(password, user.password);
+        const isPasswordValid = await bcrypt.compare(password, user.password);     
         if (!isPasswordValid) {
-            return res.status(400).json({ message: 'Wrong credintails' });
+            return res.status(400).json({ message: 'Wrong credentials' });
         }
         const token = jwt.sign(
             { userId: user._id, email: user.email },
-            'JWT_SECRET', 
+            'JWT_SECRET',
             { expiresIn: '5h' }
         );
-
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: 5 * 60 * 60 * 1000
+        });
         res.status(200).json({
             message: 'Log-in successful',
             user: {
@@ -65,10 +73,8 @@ const loginUser = async (req, res) => {
                 avatar: user.avatar,
                 status: user.status,
                 friends: user.friends
-            },
-            token
+            }
         });
-
         console.log('User logged in successfully');
     } catch (error) {
         console.error('Error during login:', error);
