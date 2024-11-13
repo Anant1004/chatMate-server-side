@@ -19,4 +19,5 @@ const FriendRequestSchema = new mongoose.Schema({
   }
 }, { timestamps: true });
 
-module.exports = mongoose.model('FriendRequest', FriendRequestSchema);
+const FriendRequest  = mongoose.model('FriendRequest', FriendRequestSchema);
+export default FriendRequest;
