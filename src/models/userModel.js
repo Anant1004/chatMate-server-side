@@ -1,7 +1,11 @@
-import mongoose from 'mongoose'; 
+import mongoose from 'mongoose';
 
 const UserSchema = new mongoose.Schema({
-  username: {
+  fullName: {
+    type: String,
+    required: true,
+  },
+  userName: {
     type: String,
     required: true,
     unique: true
@@ -14,6 +18,9 @@ const UserSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
+  },
+  avatar: {
+    type: String,
   },
   friends: [{
     type: mongoose.Schema.Types.ObjectId,
