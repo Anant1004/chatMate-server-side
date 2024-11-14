@@ -3,8 +3,9 @@ import FriendRequest from '../models/friendsrequestModel.js';
 // send a friend request
 const sendFriendRequest = async (req, res) => {
     const { receiverId } = req.body;
-    console.log(req.user._id)
-    const senderId = req.user._id;
+    console.log("requested user here",req.user);
+    console.log("requested user's Id",req.user.userId);
+    const senderId = req.user.userId;
     try {
         const friendRequest = await FriendRequest.create({ sender: senderId, receiver: receiverId });
         res.status(201).json(friendRequest);
@@ -16,7 +17,7 @@ const sendFriendRequest = async (req, res) => {
 // get friend requests
 const getFriendRequests = async (req, res) => {
     try {
-        const friendRequests = await FriendRequest.find({ receiver: req.user._id, status: 'pending' });
+        const friendRequests = await FriendRequest.find({ receiver: req.user.userId, status: 'pending' });
         res.json(friendRequests);
     } catch (error) {
         res.status(500).json({ error: error.message });
