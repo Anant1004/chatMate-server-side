@@ -5,16 +5,18 @@ import User from '../models/userModel.js';
 const sendFriendRequest = async (req, res) => {
     try {
         const { ReceiverUserName } = req.body;
-        const receiver=await User.findOne({username: ReceiverUserName});
-        if(!receiver){
-            res.status(400).json({ message: `userName with ${ReceiverUserName} does not exist.` });
+        console.log("Received Username",ReceiverUserName);
+        const receiver = await User.findOne({ userName: ReceiverUserName });
+        console.log("recieved User", receiver);
+        if (!receiver) {
+            return res.status(400).json({ message: `User with username ${ReceiverUserName} does not exist.` });
         }
-        if(receiver._id===req.user._id){
-            res.status(400).json({ message: 'cannot send a friend request to yourself.' });
+        if (receiver._id.equals(req.user._id)) {
+            return res.status(400).json({ message: 'Cannot send a friend request to yourself.' });
         }
         const senderId = req.user._id;
         const newFriendRequest = await FriendRequest.create({ sender: senderId, receiver: receiver._id });
-        await receiver.updateOne({$push:{friendRequests:newFriendRequest}});
+        await receiver.updateOne({ $push: { friendRequests: newFriendRequest } });
         res.status(201).json(newFriendRequest);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -46,7 +48,7 @@ const updateFriendRequestStatus = async (req, res) => {
     }
 };
 
-export  {
+export {
     sendFriendRequest,
     getFriendRequests,
     updateFriendRequestStatus

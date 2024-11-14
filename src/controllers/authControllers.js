@@ -1,10 +1,9 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import User from '../models/userModel.js'; 
+import User from '../models/userModel.js';
 import dotenv from 'dotenv';
 
 dotenv.config();
-const JWT_SECRET = process.env.JWT_SECRET
 
 
 const signupUser = async (req, res) => {
@@ -60,23 +59,20 @@ const loginUser = async (req, res) => {
         if (!isPasswordValid) {
             return res.status(400).json({ message: 'Wrong credentials' });
         }
-        console.log(user._id);
         const token = jwt.sign(
             { userId: user._id, email: user.email },
-            JWT_SECRET,
+            process.env.JWT_SECRET,
             { expiresIn: '5h' }
         );
         res.cookie('token', token, {
             httpOnly: true,
-            secure: true
+            secure: true 
         });
-        const loggedInUser = await User.findOneAndUpdate(
-            { _id: user._id },
-            { $set: { activeStatus: true } }
-          ).select("-password");
+        await User.findByIdAndUpdate(user._id, { activeStatus: true });
+        const loggedInUser = await User.findById(user._id).select("-password");
         res.status(200).json({
             message: 'Log-in successful',
-            user:loggedInUser
+            user: loggedInUser
         });
         console.log('User logged in successfully');
     } catch (error) {
@@ -85,10 +81,11 @@ const loginUser = async (req, res) => {
     }
 };
 
+
 const logoutUser = async (req, res) => {
     try {
         console.log(req.user);
-        await User.findByIdAndUpdate(req.user._id, { activeStatus: false });        
+        await User.findByIdAndUpdate(req.user._id, { activeStatus: false });
         res.status(200).json({ message: 'Logout successful' });
         console.log('User logged out successfully');
     } catch (error) {
