@@ -3,6 +3,7 @@ import FriendRequest from '../models/friendsrequestModel.js';
 // send a friend request
 const sendFriendRequest = async (req, res) => {
     const { receiverId } = req.body;
+    console.log(req.user._id)
     const senderId = req.user._id;
     try {
         const friendRequest = await FriendRequest.create({ sender: senderId, receiver: receiverId });
