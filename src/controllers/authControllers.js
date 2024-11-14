@@ -1,6 +1,10 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import User from '../models/userModel.js';
+import User from '../models/userModel.js'; 
+import dotenv from 'dotenv';
+
+dotenv.config();
+const JWT_SECRET = process.env.JWT_SECRET
 
 
 const signupUser = async (req, res) => {
@@ -30,7 +34,7 @@ const signupUser = async (req, res) => {
             userName: newUser.userName,
             email: newUser.email,
             avatar: newUser.avatar,
-            status: newUser.status,
+            status: newUser.activeStatus,
             friends: newUser.friends
         });
 
@@ -43,7 +47,11 @@ const signupUser = async (req, res) => {
 
 const loginUser = async (req, res) => {
     try {
+        console.log(req.body);
         const { email, password } = req.body;
+        if (!email || !password) {
+            return res.status(400).json({ message: 'All fields are required.' });
+        }
         const user = await User.findOne({ email });
         if (!user) {
             return res.status(400).json({ message: 'Invalid email or password' });
@@ -55,27 +63,21 @@ const loginUser = async (req, res) => {
         console.log(user._id);
         const token = jwt.sign(
             { userId: user._id, email: user.email },
-            process.env.JWT_PASS,
+            JWT_SECRET,
             { expiresIn: '5h' }
         );
-        res.status(200)
-            .cookie('token', token, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                maxAge: 5 * 60 * 60 * 1000
-            })
-            .json({
-                message: 'Log-in successful',
-                user: {
-                    _id: user._id,
-                    fullName: user.fullName,
-                    userName: user.userName,
-                    email: user.email,
-                    avatar: user.avatar,
-                    status: user.status,
-                    friends: user.friends
-                }
-            });
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: true
+        });
+        const loggedInUser = await User.findOneAndUpdate(
+            { _id: user._id },
+            { $set: { activeStatus: true } }
+          ).select("-password");
+        res.status(200).json({
+            message: 'Log-in successful',
+            user:loggedInUser
+        });
         console.log('User logged in successfully');
     } catch (error) {
         console.error('Error during login:', error);
@@ -85,8 +87,8 @@ const loginUser = async (req, res) => {
 
 const logoutUser = async (req, res) => {
     try {
-        const { userId } = req.body;
-        await User.findByIdAndUpdate(userId, { status: false });
+        console.log(req.user);
+        await User.findByIdAndUpdate(req.user._id, { activeStatus: false });        
         res.status(200).json({ message: 'Logout successful' });
         console.log('User logged out successfully');
     } catch (error) {
