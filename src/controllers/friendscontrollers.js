@@ -6,7 +6,7 @@ const sendFriendRequest = async (req, res) => {
     try {
         const { ReceiverUserName } = req.body;
         console.log("Received Username",ReceiverUserName);
-        const receiver = await User.findOne({ userName: ReceiverUserName });
+        const receiver = await User.findOne({ userName: "ReceiverUserName" });
         console.log("recieved User", receiver);
         if (!receiver) {
             return res.status(400).json({ message: `User with username ${ReceiverUserName} does not exist.` });

@@ -1,6 +1,5 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/userModel.js'
-const JWT_SECRET = process.env.JWT_SECRET
 
 const authenticate = async (req, res, next) => {
     const token = req.cookies?.token;
@@ -10,7 +9,7 @@ const authenticate = async (req, res, next) => {
     console.log("Token from cookie:", token);
     console.log("JWT_SECRET:", process.env.JWT_SECRET);
     try {
-        const decoded = jwt.verify(token, JWT_SECRET);
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const user = await User.findById(decoded?.userId);
         console.log(user)
         if (!user) {
