@@ -1,4 +1,4 @@
-import Message from '../models/Message.js';
+import Message from '../models/messageModel.js';
 
 // Send Message to User
 const sendMessage = async (req, res) => {
