@@ -43,7 +43,6 @@ const signupUser = async (req, res) => {
 
 const loginUser = async (req, res) => {
     try {
-        console.log(req.body);
         const { email, password } = req.body;
         if (!email || !password) {
             return res.status(400).json({ message: 'All fields are required.' });
@@ -65,7 +64,6 @@ const loginUser = async (req, res) => {
             httpOnly: true,
             secure: true 
         });
-        await User.findByIdAndUpdate(user._id, { activeStatus: true });
         const loggedInUser = await User.findById(user._id).select("-password");
         res.status(200).json({
             message: 'Log-in successful',
@@ -91,8 +89,23 @@ const logoutUser = async (req, res) => {
     }
 };
 
+const getUser=async (req, res) => {
+    try {
+        const {userId}=req.body;
+        const user = await User.findById(userId).select("-password");
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        res.status(200).json(user);
+    } catch (error) {
+        console.error('Error getting user:', error);
+        res.status(500).json({ message: 'Server error getting user' });
+    }
+}
+
 export {
     signupUser,
     loginUser,
-    logoutUser
+    logoutUser,
+    getUser
 };
