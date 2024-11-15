@@ -1,5 +1,5 @@
-import Group from '../models/Group.js';
-import Message from '../models/Message.js';
+import Group from '../models/groupModel.js';
+import Message from '../models/messageModel.js';
 
 // Create Group
 const createGroup = async (req, res) => {
