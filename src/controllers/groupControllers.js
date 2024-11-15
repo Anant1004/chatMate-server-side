@@ -15,7 +15,7 @@ const createGroup = async (req, res) => {
 // Get Group Details
 const getGroupDetails = async (req, res) => {
     try {
-        const group = await Group.findById(req.params.groupId).populate('members', 'username');
+        const group = await Group.findById(req.params.groupId).populate('members', 'userName');
         res.json(group);
     } catch (error) {
         res.status(500).json({ error: error.message });

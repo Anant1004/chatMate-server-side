@@ -20,7 +20,7 @@ const signupUser = async (req, res) => {
             email,
             password: hashedPassword,
             avatar,
-            status: false,
+            activeStatus: false,
             friends: []
         });
         await newUser.save();

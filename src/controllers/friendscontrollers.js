@@ -6,7 +6,7 @@ const sendFriendRequest = async (req, res) => {
     try {
         const { ReceiverUserName } = req.body;
         console.log("Received Username",ReceiverUserName);
-        const receiver = await User.findOne({ userName: "ReceiverUserName" });
+        const receiver = await User.findOne({ userName: ReceiverUserName });
         console.log("recieved User", receiver);
         if (!receiver) {
             return res.status(400).json({ message: `User with username ${ReceiverUserName} does not exist.` });
@@ -15,6 +15,14 @@ const sendFriendRequest = async (req, res) => {
             return res.status(400).json({ message: 'Cannot send a friend request to yourself.' });
         }
         const senderId = req.user._id;
+        const existingRequest = await FriendRequest.findOne({
+            sender: req.user._id,
+            receiver: receiver._id,
+            status: 'pending',
+        });
+        if (existingRequest) {
+            return res.status(400).json({ message: 'Friend request already sent.' });
+        }        
         const newFriendRequest = await FriendRequest.create({ sender: senderId, receiver: receiver._id });
         await receiver.updateOne({ $push: { friendRequests: newFriendRequest } });
         res.status(201).json(newFriendRequest);
