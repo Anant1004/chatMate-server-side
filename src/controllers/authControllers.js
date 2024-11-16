@@ -81,6 +81,12 @@ const logoutUser = async (req, res) => {
     try {
         console.log(req.user);
         await User.findByIdAndUpdate(req.user._id, { activeStatus: false });
+        res.clearCookie('token', {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production', 
+            sameSite: 'strict',
+        });
+        
         res.status(200).json({ message: 'Logout successful' });
         console.log('User logged out successfully');
     } catch (error) {

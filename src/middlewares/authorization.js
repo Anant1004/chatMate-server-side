@@ -4,7 +4,7 @@ import User from '../models/userModel.js'
 const authenticate = async (req, res, next) => {
     const token = req.cookies?.token;
     if (!token) {
-        return res.status(401).json({ error: 'Access denied. No token provided.' });
+        return res.status(401).json({ error: 'Access denied.' });
     }
     console.log("Token from cookie:", token);
     console.log("JWT_SECRET:", process.env.JWT_SECRET);
