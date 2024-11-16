@@ -48,7 +48,7 @@ A full-stack chatting application built with the MERN (MongoDB, Express, React, 
      ```
    - Start the backend server:
      ```bash
-     npm run dev
+     npm start
      ```
 
 3. **Frontend Setup**
@@ -63,7 +63,7 @@ A full-stack chatting application built with the MERN (MongoDB, Express, React, 
      ```
    - Start the frontend development server:
      ```bash
-     npm start
+     npm run dev
      ```
 
 ## Usage
