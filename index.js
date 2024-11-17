@@ -2,6 +2,7 @@ import express from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
 import dotenv from 'dotenv';
+import cors from 'cors';
 import authRoutes from './src/routes/authRoutes.js';
 import friendsRoutes from './src/routes/friendsRoutes.js';
 import messageRoutes from './src/routes/messageRoutes.js';
@@ -21,6 +22,13 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(morgan('dev'));
 
+// CORS Configuration for Express
+app.use(cors({
+    origin: 'http://localhost:5173',
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'OPTIONS', 'DELETE'], 
+    credentials: true 
+}));
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/friend-requests', authenticate, friendsRoutes);
@@ -32,7 +40,7 @@ const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
         origin: 'http://localhost:5173',
-        methods: ['GET', 'POST', 'PUT','PATCH','OPTIONS','DELETE'],
+        methods: ['GET', 'POST', 'PUT', 'PATCH', 'OPTIONS', 'DELETE'],
         credentials: true
     }
 });

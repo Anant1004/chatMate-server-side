@@ -21,6 +21,7 @@ const UserSchema = new mongoose.Schema({
   },
   avatar: {
     type: String,
+    default: 'https://picsum.photos/200', 
   },
   friends: [{
     type: mongoose.Schema.Types.ObjectId,
