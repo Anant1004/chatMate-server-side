@@ -54,9 +54,16 @@ const acceptFriendRequest = async (req, res) => {
             return res.status(400).json({ message: `User with username ${username} does not exist.` });
         }
         const user=req.user;
+        // if(user.friends.includes(sender._id)){
+        //     return res.status(400).json({ message: 'User is already a friend.' });
+        // }
+        if(!user.friendRequests.includes(sender._id)){
+            return res.status(400).json({ message: 'Friend request not found.' });
+        }
+        const requests = user.friendRequests.filter(id=>id.toString()!==sender._id.toString());
         await User.findByIdAndUpdate(user._id,{
-            $pull:{friendRequest:sender._id},
-            $push:{friends:sender._id}
+            $push:{friends:sender._id},
+            $set:{friendRequests:requests}
         });
         await User.findByIdAndUpdate(sender._id,{$push:{friends:user._id}});
         res.status(200).json({ message: 'Friend request accepted.' });
@@ -79,8 +86,12 @@ const declineFriendRequest = async (req, res) => {
             return res.status(400).json({ message: `User with username ${username} does not exist.` });
         }
         const user=req.user;
+        if(!user.friendRequests.includes(sender._id)){
+            return res.status(400).json({ message: 'Friend request not found.' });
+        }
+        const requests = user.friendRequests.filter(id=>id.toString()!==sender._id.toString());
         await User.findByIdAndUpdate(user._id,{
-            $pull:{friendRequest:sender._id},
+            $set:{friendRequests:requests},
         });
         res.status(200).json({ message: 'Friend request declined.' });
     } catch (error) {
