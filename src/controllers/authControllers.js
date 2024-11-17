@@ -95,23 +95,24 @@ const logoutUser = async (req, res) => {
     }
 };
 
-const getUser=async (req, res) => {
+const getAllUsers = async (req, res) => {
     try {
-        const {userId}=req.body;
-        const user = await User.findById(userId).select("-password");
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+        // Get all users, excluding the password field
+        const users = await User.find().select("-password");
+        if (!users || users.length === 0) {
+            return res.status(404).json({ message: 'No users found' });
         }
-        res.status(200).json(user);
+        res.status(200).json(users);
     } catch (error) {
-        console.error('Error getting user:', error);
-        res.status(500).json({ message: 'Server error getting user' });
+        console.error('Error getting users:', error);
+        res.status(500).json({ message: 'Server error getting users' });
     }
-}
+};
+
 
 export {
     signupUser,
     loginUser,
     logoutUser,
-    getUser
+    getAllUsers
 };
