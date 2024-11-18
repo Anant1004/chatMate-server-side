@@ -6,12 +6,9 @@ const authenticate = async (req, res, next) => {
     if (!token) {
         return res.status(401).json({ error: 'Access denied.' });
     }
-    console.log("Token from cookie:", token);
-    console.log("JWT_SECRET:", process.env.JWT_SECRET);
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const user = await User.findById(decoded?.userId).select('-password');
-        console.log(user)
         if (!user) {
             return res.status(404).json({ error: 'User not found or Invalid Token.' });
         }
