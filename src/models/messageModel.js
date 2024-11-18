@@ -11,6 +11,10 @@ const MessageSchema = new mongoose.Schema({
       ref: 'User',
       required: true
     },
+    readBy: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    }]
   }],
   target: {
     type: mongoose.Schema.Types.ObjectId,
@@ -22,10 +26,6 @@ const MessageSchema = new mongoose.Schema({
     enum: ['User', 'Group'],
     required: true
   }, // it's a user or group chat
-  readBy: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
-  }]
 }, { timestamps: true });
 
 const Message = mongoose.model('Message', MessageSchema);
