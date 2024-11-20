@@ -5,27 +5,22 @@ const MessageSchema = new mongoose.Schema({
     content:{
       type:String,
       required:true,
+      trim:true
     },
     sender: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: true
     },
-    readBy: [{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User'
-    }]
-  }],
-  target: {
-    type: mongoose.Schema.Types.ObjectId,
-    refPath: 'targetModel',
-    required: true
-  },
-  targetModel: {
-    type: String,
-    enum: ['User', 'Group'],
-    required: true
-  }, // it's a user or group chat
+    sentAt:{
+      type: Date,
+      default:Date.now()
+    },
+    isSeen: {
+      type: Boolean,
+      default: false
+    }
+  }]
 }, { timestamps: true });
 
 const Message = mongoose.model('Message', MessageSchema);

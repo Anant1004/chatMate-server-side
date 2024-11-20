@@ -34,6 +34,16 @@ const UserSchema = new mongoose.Schema({
   friendRequests: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
+  }],
+  chats:[{
+    chatWith:{      // store username 
+      type: String,
+      required: true
+    },
+    messages:{
+      type:mongoose.Schema.Types.ObjectId,
+      ref:'Message'
+    }
   }]
 }, { timestamps: true });
 

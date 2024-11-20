@@ -1,3 +1,4 @@
+import Message from '../models/messageModel.js';
 import User from '../models/userModel.js';
 
 // send a friend request
@@ -54,18 +55,30 @@ const acceptFriendRequest = async (req, res) => {
             return res.status(400).json({ message: `User with username ${username} does not exist.` });
         }
         const user=req.user;
-        // if(user.friends.includes(sender._id)){
-        //     return res.status(400).json({ message: 'User is already a friend.' });
-        // }
+        if(user.friends.includes(sender._id)){
+            return res.status(400).json({ message: 'User is already a friend.' });
+        }
         if(!user.friendRequests.includes(sender._id)){
             return res.status(400).json({ message: 'Friend request not found.' });
         }
         const requests = user.friendRequests.filter(id=>id.toString()!==sender._id.toString());
-        await User.findByIdAndUpdate(user._id,{
-            $push:{friends:sender._id},
-            $set:{friendRequests:requests}
+        const newChat=new Message({
+            text:[]
         });
-        await User.findByIdAndUpdate(sender._id,{$push:{friends:user._id}});
+        newChat.save();
+        await User.findByIdAndUpdate(user._id,{
+            $push: {
+                friends: sender._id,
+                chats:{chatWith:sender.userName,messages:newChat._id }
+              },
+            $set:{friendRequests:requests},
+        });
+        await User.findByIdAndUpdate(sender._id,{
+            $push: {
+                friends: user._id,
+                chats:{chatWith:user.userName,messages:newChat._id }
+              },
+        });
         res.status(200).json({ message: 'Friend request accepted.' });
     } catch (error) {
         console.log('Error while accepting friend request : ',error);
