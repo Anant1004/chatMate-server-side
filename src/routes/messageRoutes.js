@@ -1,11 +1,11 @@
 import express from 'express';
-import { sendMessage, getMessagesWithUser, markMessageAsRead } from '../controllers/messageControllers.js';
+import { sendMessage, getMessagesWithUser, setReadBy } from '../controllers/messageControllers.js';
 
 const router = express.Router();
 
 
-router.post('/user', sendMessage);
-router.get('/user/:userId', getMessagesWithUser);
-router.put('/:messageId/read', markMessageAsRead);
+router.post('/sendMessage', sendMessage);
+router.get('/getMessages/:userId', getMessagesWithUser);
+router.post('/setReadBy', setReadBy);
 
 export default router;

@@ -1,17 +1,35 @@
 import Message from '../models/messageModel.js';
+import User from '../models/userModel.js';
 
 // Send Message to User
 const sendMessage = async (req, res) => {
-    const { targetId, text } = req.body;
     try {
-        const message = await Message.create({
-            sender: req.user._id,
-            text,
-            target: targetId,
-            targetModel: 'User',
-        });
-        res.status(201).json(message);
+        const { targetUser,targetGroup, text } = req.body;      // either targetUser or targetGroup should be sent from frontend
+        if (targetUser && targetGroup){
+            return res.status(400).json({ message: 'Both targetUser and targetGroup cannot be sent at the same time.' });
+        }
+        if(!targetUser && !targetGroup){
+            return res.status(400).json({ message: 'Either targetUser or targetGroup is required.' });
+        }
+        if(targetUser){
+            const user=req.user;
+            const receiver = await User.findOne({userName:targetUser});
+            if(!user.friends.includes(receiver._id)){
+                return res.status(400).json({ message: `${targetUser} is not a friend of ${user.userName}.` });
+            }
+            if(!receiver){
+                return res.status(400).json({ message: `${receiver} does not exist.` });
+            }
+            const chat=user.chats.find(chat=>chat.chatWith===targetUser);
+            await Message.findByIdAndUpdate(chat.messages,{
+                $push:{text:{content:text,sender:user._id,readBy:[]}}
+            });
+        }else{
+            // send message in groupchat
+        }
+        return res.status(200).json({ message:'message sent successfully. '});
     } catch (error) {
+        console.log('error while sending message',error)
         res.status(500).json({ error: error.message });
     }
 };
@@ -19,28 +37,36 @@ const sendMessage = async (req, res) => {
 // Get Messages with User
 const getMessagesWithUser = async (req, res) => {
     try {
-        const messages = await Message.find({
-            $or: [
-                { sender: req.user._id, target: req.params.userId },
-                { sender: req.params.userId, target: req.user._id },
-            ],
-            targetModel: 'User',
-        });
+        const user=req.user;
+        const chat=user.chats.find(chat=>chat.chatWith===req.params.userId);
+        if(!chat){
+            return res.status(400).json({ message: 'No chat found.' });
+        }
+        const messages=await Message.findById(chat.messages);
         res.json(messages);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 };
 
+// Get Messages with Group
+
+// const getGroupMessages = async (req, res) => {
+//     try {
+//         const messages = await Message.find({});
+//         res.json(messages);
+//     } catch (error) {
+//         res.status(500).json({ error: error.message });
+//     }
+// };
+
 // Mark Message as Read
-const markMessageAsRead = async (req, res) => {
+const setReadBy = async (req, res) => {
     try {
-        const message = await Message.findByIdAndUpdate(
-            req.params.messageId,
-            { $addToSet: { readBy: req.user._id } },
-            { new: true }
-        );
-        res.json(message);
+        await Message.findByIdAndUpdate(req.body.messageId,{
+            $set: { "text.$[].isSeen": true }
+        },);
+        res.json({ message:'Message read successfully.' });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -49,5 +75,6 @@ const markMessageAsRead = async (req, res) => {
 export {
     sendMessage,
     getMessagesWithUser,
-    markMessageAsRead
+    // getGroupMessages,
+    setReadBy,
 }
