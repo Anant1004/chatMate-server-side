@@ -16,7 +16,7 @@ const createGroup = async (req, res) => {
         if(!members.includes(req.user._id)){
             members.push(req.user._id);
         }
-        const group = await Group.create({ name, members, createdBy: req.user._id,message: newChat._id });
+        const group = await Group.create({ name, members, createdBy: req.user._id,messages: newChat._id });
         res.status(201).json(group);
     } catch (error) {
         console.log('Error creating group', error);
@@ -109,10 +109,31 @@ const updateGroup = async (req, res) => {
     }
 }
 
+// Delete group
+
+const deleteGroup = async (req, res) => {
+    try {
+        const { groupId } = req.body;
+        if(!groupId){
+            return res.status(400).json({ message: 'Group ID is required.' });
+        }
+        const group = await Group.findByIdAndDelete(groupId);
+        if(!group){
+            return res.status(400).json({ message: `Group does not exist.` });
+        }
+        await Message.findByIdAndDelete(group.messages);
+        res.status(200).json({ message: 'Group deleted successfully.' });
+    } catch (error) {
+        console.log("Error while deleting group : Error :: ",error);
+        res.status(500).json({ error: error.message });
+    }
+}
+
 export {
     createGroup,
     getGroupDetails,
     addSingleMemberToGroup,
     removeSingleMemberFromGroup,
     updateGroup,
+    deleteGroup,
 }
