@@ -113,9 +113,22 @@ const declineFriendRequest = async (req, res) => {
     }
 }
 
+// Get all friends list
+
+const getFriendList = async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id).select('-password');
+        res.status(200).json(user.friends);
+    } catch (error) {
+        console.log('Error while fetching friends',error);
+        res.status(500).json({ error: error.message });
+    }
+}
+
 export {
     sendFriendRequest,
     getFriendRequests,
     acceptFriendRequest,
-    declineFriendRequest
+    declineFriendRequest,
+    getFriendList
 }
