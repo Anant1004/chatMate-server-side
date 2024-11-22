@@ -22,7 +22,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(morgan('dev'));
 
-// CORS Configuration for Express
 app.use(cors({
     origin: 'http://localhost:5173',
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'OPTIONS', 'DELETE'], 
@@ -47,25 +46,10 @@ const io = new Server(server, {
 
 // Socket.IO event handling
 io.on('connection', (socket) => {
+    console.log('Socket.IO connected')
     console.log(`User connected: ${socket.id}`);
 
-    // User joins a room (roomId can be user ID or group ID)
-    socket.on('join-room', (roomId) => {
-        socket.join(roomId);
-        console.log(`User ${socket.id} joined room: ${roomId}`);
-    });
-
-    // Handle message sending
-    socket.on('send-message', (messageData) => {
-        const { roomId, sender, text } = messageData;
-        console.log(`Message from ${sender} to room ${roomId}: ${text}`);
-        io.to(roomId).emit('receive-message', {
-            sender,
-            text,
-            timestamp: new Date()
-        });
-    });
-
+    
     // Handle user disconnection
     socket.on('disconnect', () => {
         console.log(`User disconnected: ${socket.id}`);

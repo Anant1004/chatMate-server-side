@@ -62,7 +62,7 @@ const loginUser = async (req, res) => {
         );
         res.cookie('token', token, {
             httpOnly: true,
-            secure: true 
+            secure: true
         });
         const loggedInUser = await User.findById(user._id).select("-password");
         res.status(200).json({
@@ -83,10 +83,10 @@ const logoutUser = async (req, res) => {
         await User.findByIdAndUpdate(req.user._id, { activeStatus: false });
         res.clearCookie('token', {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production', 
+            secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
         });
-        
+
         res.status(200).json({ message: 'Logout successful' });
         console.log('User logged out successfully');
     } catch (error) {
@@ -97,7 +97,6 @@ const logoutUser = async (req, res) => {
 
 const getAllUsers = async (req, res) => {
     try {
-        // Get all users, excluding the password field
         const users = await User.find().select("-password");
         if (!users || users.length === 0) {
             return res.status(404).json({ message: 'No users found' });
