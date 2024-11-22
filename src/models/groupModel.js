@@ -15,10 +15,10 @@ const GroupSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
-  messages: [{
+  messages: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Message'
-  }]
+  }
 }, { timestamps: true });
 
 const Group= mongoose.model('Group', GroupSchema);
