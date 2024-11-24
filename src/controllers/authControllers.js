@@ -97,7 +97,7 @@ const logoutUser = async (req, res) => {
 
 const getAllUsers = async (req, res) => {
     try {
-        const users = await User.find().select("-password");
+        const users = await User.find({ _id: { $ne: req.user._id } }).select("-password"); // added the $ne for excluding the loggedin user 
         if (!users || users.length === 0) {
             return res.status(404).json({ message: 'No users found' });
         }
