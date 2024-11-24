@@ -95,7 +95,7 @@ const logoutUser = async (req, res) => {
     }
 };
 
-const getAllUsers = async (req, res) => {
+const getAllUsersExceptLoggedIn = async (req, res) => {
     try {
         const users = await User.find({ _id: { $ne: req.user._id } }).select("-password"); // added the $ne for excluding the loggedin user 
         if (!users || users.length === 0) {
@@ -125,6 +125,6 @@ export {
     signupUser,
     loginUser,
     logoutUser,
-    getAllUsers,
+    getAllUsersExceptLoggedIn,
     getCurrentUser
 };
