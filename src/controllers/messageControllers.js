@@ -14,7 +14,7 @@ const sendMessage = async (req, res) => {
         }
         if (targetUser) {
             const user = req.user;
-            const receiver = await User.findOne({ userName: targetUser });
+            const receiver = await User.findOne({ _id : targetUser });
             if (!receiver) {
                 return res.status(400).json({ message: `${receiver} does not exist.` });
             }
