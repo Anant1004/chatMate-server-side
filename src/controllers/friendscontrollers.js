@@ -13,8 +13,8 @@ const sendFriendRequest = async (req, res) => {
         if (ReceiverUserId === sender.userName) {
             return res.status(400).json({ message: 'Cannot send a friend request to yourself.' });
         }
-        const receiver = await User.findOne({ _id : ReceiverUserId }).select('-password');
-        console.log("this is the reciver",receiver)
+        const receiver = await User.findOne({ _id: ReceiverUserId }).select('-password');
+        console.log("this is the reciver", receiver)
         if (!receiver) {
             return res.status(400).json({ message: `User with username ${ReceiverUserId} does not exist.` });
         }
@@ -48,13 +48,13 @@ const getFriendRequests = async (req, res) => {
 
 const acceptFriendRequest = async (req, res) => {
     try {
-        const { username } = req.body;
-        if (!username) {
+        const { userId } = req.body;
+        if (!userId) {
             return res.status(400).json({ message: 'Username is required.' });
         }
-        const sender = await User.findOne({ userName: username }).select('-password');
+        const sender = await User.findOne({ _id: userId }).select('-password');
         if (!sender) {
-            return res.status(400).json({ message: `User with username ${username} does not exist.` });
+            return res.status(400).json({ message: `User with username ${userId} does not exist.` });
         }
         const user = req.user;
         if (user.friends.includes(sender._id)) {

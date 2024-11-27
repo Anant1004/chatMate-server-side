@@ -11,8 +11,8 @@ const router = express.Router();
 router.get('/getFriendRequests', getFriendRequests);
 router.get('/getFriends',getFriendList);
 router.post('/sendFriendRequest', sendFriendRequest);
-router.put('/acceptReqest', acceptFriendRequest);
-router.patch('/declineReqest', declineFriendRequest);
+router.put('/acceptRequest', acceptFriendRequest);
+router.patch('/declineRequest', declineFriendRequest);
 
 
 export default router
