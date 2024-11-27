@@ -92,13 +92,13 @@ const acceptFriendRequest = async (req, res) => {
 
 const declineFriendRequest = async (req, res) => {
     try {
-        const { username } = req.body;
-        if (!username) {
-            return res.status(400).json({ message: 'Username is required.' });
+        const { userId } = req.body;
+        if (!userId) {
+            return res.status(400).json({ message: 'userId is required.' });
         }
-        const sender = await User.findOne({ userName: username }).select('-password');
+        const sender = await User.findOne({ _id: userId }).select('-password');
         if (!sender) {
-            return res.status(400).json({ message: `User with username ${username} does not exist.` });
+            return res.status(400).json({ message: `User with username ${userId} does not exist.` });
         }
         const user = req.user;
         if (!user.friendRequests.includes(sender._id)) {
