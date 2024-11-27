@@ -18,7 +18,7 @@ const sendMessage = async (req, res) => {
             if (!receiver) {
                 return res.status(400).json({ message: `${receiver} does not exist.` });
             }
-            if (!user.friends.includes(receiver._id)) {
+            if (!user.friends?.includes(receiver._id)) {
                 return res.status(400).json({ message: `${targetUser} is not a friend of ${user.userName}.` });
             }
             const chat = user.chats.find(chat => chat.chatWith === targetUser);
