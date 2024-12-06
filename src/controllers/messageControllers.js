@@ -60,13 +60,19 @@ const getMessagesWithUser = async (req, res) => {
     try {
         const user = req.user;
         const chat = user.chats.find(chat => chat.chatWith === req.params.userId);
-        console.log("this is the chat", chat)
+        // console.log("Chat object:", chat);
         if (!chat) {
             return res.status(400).json({ message: 'No chat found.' });
         }
+        // console.log("Message ObjectId:", chat.messages);
         const messages = await Message.findById(chat.messages);
+        // console.log("message",messages.text)
+        if (!messages) {
+            return res.status(404).json({ message: 'Messages not found.' });
+        }
         res.status(200).json(messages.text);
     } catch (error) {
+        console.error("Error while getting messages:", error);
         res.status(500).json({ error: error.message });
     }
 };
