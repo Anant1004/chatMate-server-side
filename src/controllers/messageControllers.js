@@ -5,7 +5,8 @@ import User from '../models/userModel.js';
 // Send Message to User
 const sendMessage = async (req, res) => {
     try {
-        const { targetUser, targetGroupId, text } = req.body; // either targetUser or targetGroup should be sent from frontend
+        const { targetUser, targetGroupId, text } = req.body;
+        console.log("Required data:", targetUser, targetGroupId, text);
         if (targetUser && targetGroupId) {
             return res.status(400).json({ message: 'Both targetUser and targetGroup cannot be sent at the same time.' });
         }
@@ -13,24 +14,43 @@ const sendMessage = async (req, res) => {
             return res.status(400).json({ message: 'Either targetUser or targetGroup is required.' });
         }
         if (targetUser) {
-            const user = req.user;
-            const receiver = await User.findOne({ _id : targetUser });
+            const user = await User.findById(req.user._id);
+            const receiver = await User.findById(targetUser);
             if (!receiver) {
-                return res.status(400).json({ message: `${receiver} does not exist.` });
+                return res.status(404).json({ message: 'Receiver does not exist.' });
             }
             if (!user.friends?.includes(receiver._id)) {
-                return res.status(400).json({ message: `${targetUser} is not a friend of ${user.userName}.` });
+                return res.status(400).json({ message: `${receiver.userName} is not a friend of ${user.userName}.` });
             }
-            const chat = user.chats.find(chat => chat.chatWith === targetUser);
-            await Message.findByIdAndUpdate(chat.messages, {
-                $push: { text: { content: text, sender: user._id, readBy: [] } }
-            });
+            console.log("User chats:", user.chats);
+            const chat = user.chats.find(chat => chat.chatWith === receiver.userName);
+            if (!chat || !chat.messages) {
+                console.log("Error: Chat does not exist.");
+                return res.status(404).json({ message: 'Chat does not exist.' });
+            }
+            const updatedMessage = await Message.findByIdAndUpdate(
+                chat.messages,
+                {
+                    $push: {
+                        text: {
+                            content: text,
+                            sender: user._id,
+                            sentAt: Date.now(),
+                        },
+                    },
+                },
+                { new: true }
+            );
+            if (!updatedMessage) {
+                return res.status(500).json({ message: 'Failed to update messages.' });
+            }
         } else {
-
+            // Handle group chat logic here
         }
-        return res.status(201).json({ message: 'message sent successfully. ' });
+
+        return res.status(201).json({ message: 'Message sent successfully.' });
     } catch (error) {
-        console.log('error while sending message', error)
+        console.error('Error while sending message:', error);
         res.status(500).json({ error: error.message });
     }
 };
