@@ -13,8 +13,8 @@ const sendMessage = async (req, res) => {
         if (!targetUser && !targetGroupId) {
             return res.status(400).json({ message: 'Either targetUser or targetGroup is required.' });
         }
+        const user = req.user;
         if (targetUser) {
-            const user = await User.findById(req.user._id);
             const receiver = await User.findById(targetUser);
             if (!receiver) {
                 return res.status(404).json({ message: 'Receiver does not exist.' });
@@ -45,7 +45,22 @@ const sendMessage = async (req, res) => {
                 return res.status(500).json({ message: 'Failed to update messages.' });
             }
         } else {
-            // Handle group chat logic here
+            const group = await Group.findById(targetGroupId);
+            if (!group) {
+                return res.status(404).json({ message: 'Group does not exist.' });
+            }
+            if (!group.members.includes(user._id)) {
+                return res.status(400).json({ message: 'User is not a member of this group.' });
+            }
+            await Message.findByIdAndUpdate(group.messages,{
+                $push:{
+                    text:{
+                        content:text,
+                        sender:user._id,
+                        sentAt: Date.now(),
+                    }
+                }
+            });
         }
 
         return res.status(201).json({ message: 'Message sent successfully.' });
