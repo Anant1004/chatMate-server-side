@@ -36,8 +36,7 @@ const sendFriendRequest = async (req, res) => {
 const getFriendRequests = async (req, res) => {
     try {
         const user = await User.findById(req.user._id);
-
-        res.json(user);
+        res.status(200).json(user.friendRequests);
     } catch (error) {
         console.log('Error while fetching friend requests', error);
         res.status(500).json({ error: error.message });
