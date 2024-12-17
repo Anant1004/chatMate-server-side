@@ -7,6 +7,7 @@ import authRoutes from './src/routes/authRoutes.js';
 import friendsRoutes from './src/routes/friendsRoutes.js';
 import messageRoutes from './src/routes/messageRoutes.js';
 import groupRoutes from './src/routes/groupRoutes.js';
+import uploadFileRoute from './src/routes/upload.file.route.js';
 import connectToDb from './src/connections/db.js';
 import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
@@ -30,6 +31,7 @@ app.use(cors({
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/uploadProfile', uploadFileRoute);
 app.use('/api/friend-requests', authenticate, friendsRoutes);
 app.use('/api/messages', authenticate, messageRoutes);
 app.use('/api/groups', authenticate, groupRoutes);
