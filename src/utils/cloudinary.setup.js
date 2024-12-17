@@ -1,30 +1,35 @@
 import { v2 as cloudinary } from 'cloudinary';
 import fs from 'fs';
-import { upload }  from '../middlewares/multer.middleware.js';
 
-
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,      
-  api_secret: process.env.CLOUDINARY_API_SECRET 
+cloudinary.config({ 
+    cloud_name: 'chatmateapp', 
+    api_key: '171755585546456', 
+    api_secret: 'Njh1RM8p8pVJcCnjdciQLBmBE0k' 
 });
 
-const uploadOnCloudinary = async (upload) => {
-  try {
-    if (!upload.file.path) {
-      return null;
+const uploadOnCloudinary = async (file) => {
+    try {
+        if (!file.path) {
+            throw new Error("File path not found.");
+        }
+
+        console.log("Uploading file from path:", file.path);
+
+        // Upload kare ga file  to Cloudinary
+        const result = await cloudinary.uploader.upload(file.path , {
+            resource_type: 'auto',
+        });
+
+        console.log("File uploaded successfully to Cloudinary:", result.url);
+
+      //  ye delete kar de ga file after upload to cloudinary
+        fs.unlinkSync(file.path);
+
+        return result;
+    } catch (error) {
+        console.error("Error uploading file to Cloudinary:", error.message);
+        throw error;
     }
-    console.log("upload",upload.file.path);
-    
-    const result = await cloudinary.uploader.upload('https://res.cloudinary.com/demo/image/upload/getting-started/shoes.jpg' , {
-        resource_type: 'auto'
-    });
-    console.log("file uploaded successfully",result.url);
-    
-    return result;
-  } catch (error) {
-    fs.unlinkSync(upload.file.path);
-    return null;
-  }
 };
-export  { uploadOnCloudinary };
+
+export { uploadOnCloudinary };
