@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import User from '../models/userModel.js';
+import { uploadOnCloudinary } from '../utils/cloudinary.js';
 
 
 const signupUser = async (req, res) => {
@@ -119,7 +120,7 @@ const getCurrentUser = async (req, res) => {
         console.error('Error fetching current user:', error);
         res.status(500).json({ message: 'Server error fetching current user' });
     }
-};
+}; 
 
 const getUserById = async (req, res) => {
     try {
@@ -135,6 +136,22 @@ const getUserById = async (req, res) => {
     }
 };
 
+const updateAvatar = async (req, res) => {
+    try {
+        if (!req?.file.path) {
+            return res.status(400).send({ message: "Avatar is missing." });
+        }
+        const result = await uploadOnCloudinary(req.file.path);
+        if(!result.url){
+            return res.status(400).json({ message: 'Error uploading to cloudinary' });
+        }
+        await User.findByIdAndUpdate(req.user._id, { avatar: result.url });
+        res.status(200).send({ message: "File uploaded successfully", url: result.url });
+    } catch (error) {
+        res.status(500).send({ message: "Error uploading file", error: error.message });
+    }
+};
+
 
 export {
     signupUser,
@@ -142,5 +159,7 @@ export {
     logoutUser,
     getAllUsersExceptLoggedIn,
     getCurrentUser,
-    getUserById
+    getUserById,
+    updateAvatar,
+ 
 };
