@@ -48,13 +48,7 @@ const io = new Server(server, {
 
 // Socket.IO event handling
 io.on('connection', (socket) => {
-    console.log('Socket.IO connected')
-    console.log(`User connected: ${socket.id}`);
-
-    
-    // Handle user disconnection
     socket.on('disconnect', () => {
-        console.log(`User disconnected: ${socket.id}`);
     });
 });
 

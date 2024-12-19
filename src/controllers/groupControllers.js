@@ -19,7 +19,6 @@ const createGroup = async (req, res) => {
         const group = await Group.create({ name, members, createdBy: req.user._id,messages: newChat._id });
         res.status(201).json(group);
     } catch (error) {
-        console.log('Error creating group', error);
         res.status(500).json({ error: error.message });
     }
 };
@@ -57,7 +56,6 @@ const addSingleMemberToGroup = async (req, res) => {
         await group.save();
         res.status(201).json({ message: 'member has been added.' });
     } catch (error) {
-        console.log('Error adding members to group', error);
         res.status(500).json({ error: error.message });
     }
 };
@@ -85,7 +83,6 @@ const removeSingleMemberFromGroup = async (req, res) => {
         await group.save();
         res.status(200).json({ message:'member removed successfully'});
     } catch (error) {
-        console.log("Error while removing a member : Error :: ",error);
         res.status(500).json({ error: error.message });
     }
 }
@@ -104,7 +101,6 @@ const updateGroup = async (req, res) => {
         }
         res.status(200).json(group);
     } catch (error) {
-        console.log("Error while changing group name : Error :: ",error);
         res.status(500).json({ error: error.message });
     }
 }
@@ -124,7 +120,6 @@ const deleteGroup = async (req, res) => {
         await Message.findByIdAndDelete(group.messages);
         res.status(200).json({ message: 'Group deleted successfully.' });
     } catch (error) {
-        console.log("Error while deleting group : Error :: ",error);
         res.status(500).json({ error: error.message });
     }
 }

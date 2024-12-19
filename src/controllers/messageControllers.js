@@ -6,7 +6,6 @@ import User from '../models/userModel.js';
 const sendMessage = async (req, res) => {
     try {
         const { targetUser, targetGroupId, text } = req.body;
-        console.log("Required data:", targetUser, targetGroupId, text);
         if (targetUser && targetGroupId) {
             return res.status(400).json({ message: 'Both targetUser and targetGroup cannot be sent at the same time.' });
         }
@@ -22,10 +21,8 @@ const sendMessage = async (req, res) => {
             if (!user.friends?.includes(receiver._id)) {
                 return res.status(400).json({ message: `${receiver.userName} is not a friend of ${user.userName}.` });
             }
-            console.log("User chats:", user.chats);
             const chat = user.chats.find(chat => chat.chatWith === receiver.userName);
             if (!chat || !chat.messages) {
-                console.log("Error: Chat does not exist.");
                 return res.status(404).json({ message: 'Chat does not exist.' });
             }
             const updatedMessage = await Message.findByIdAndUpdate(
@@ -75,13 +72,10 @@ const getMessagesWithUser = async (req, res) => {
     try {
         const user = req.user;
         const chat = user.chats.find(chat => chat.chatWith === req.params.userId);
-        // console.log("Chat object:", chat);
         if (!chat) {
             return res.status(400).json({ message: 'No chat found.' });
         }
-        // console.log("Message ObjectId:", chat.messages);
         const messages = await Message.findById(chat.messages);
-        // console.log("message",messages.text)
         if (!messages) {
             return res.status(404).json({ message: 'Messages not found.' });
         }

@@ -5,7 +5,6 @@ import User from '../models/userModel.js';
 const sendFriendRequest = async (req, res) => {
     try {
         const { ReceiverUserId } = req.body;
-        console.log("backend recived", ReceiverUserId);
         if (!ReceiverUserId) {
             return res.status(400).json({ message: 'Receiver username is required.' });
         }
@@ -14,7 +13,6 @@ const sendFriendRequest = async (req, res) => {
             return res.status(400).json({ message: 'Cannot send a friend request to yourself.' });
         }
         const receiver = await User.findOne({ _id: ReceiverUserId }).select('-password');
-        console.log("this is the reciver", receiver)
         if (!receiver) {
             return res.status(400).json({ message: `User with username ${ReceiverUserId} does not exist.` });
         }
@@ -27,7 +25,6 @@ const sendFriendRequest = async (req, res) => {
         await User.findByIdAndUpdate(receiver._id, { $push: { friendRequests: sender._id } });
         res.status(201).json({ message: 'Friend request sent successfully.', sender: sender, receiver: receiver });
     } catch (error) {
-        console.log('Error while sending friend request : ', error);
         res.status(500).json({ error: error.message });
     }
 };
@@ -38,7 +35,6 @@ const getFriendRequests = async (req, res) => {
         const user = await User.findById(req.user._id);
         res.status(200).json(user.friendRequests);
     } catch (error) {
-        console.log('Error while fetching friend requests', error);
         res.status(500).json({ error: error.message });
     }
 };
@@ -82,7 +78,6 @@ const acceptFriendRequest = async (req, res) => {
         });
         res.status(200).json({ message: 'Friend request accepted.' });
     } catch (error) {
-        console.log('Error while accepting friend request : ', error);
         res.status(500).json({ error: error.message });
     }
 }
@@ -109,7 +104,6 @@ const declineFriendRequest = async (req, res) => {
         });
         res.status(200).json({ message: 'Friend request declined.' });
     } catch (error) {
-        console.log('Error while declining friend request : ', error);
         res.status(500).json({ error: error.message });
     }
 }
@@ -121,7 +115,6 @@ const getFriendList = async (req, res) => {
         const user = await User.findById(req.user._id).select('-password');
         res.status(200).json(user.friends);
     } catch (error) {
-        console.log('Error while fetching friends', error);
         res.status(500).json({ error: error.message });
     }
 }

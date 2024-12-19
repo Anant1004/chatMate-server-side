@@ -35,7 +35,6 @@ const signupUser = async (req, res) => {
             friends: newUser.friends
         });
 
-        console.log('sign-up successfully');
     } catch (error) {
         console.error('Error sign-up:', error);
         res.status(500).json({ message: 'Server error sign-up' });
@@ -70,7 +69,6 @@ const loginUser = async (req, res) => {
             message: 'Log-in successful',
             user: loggedInUser
         });
-        console.log('User logged in successfully');
     } catch (error) {
         console.error('Error during login:', error);
         res.status(500).json({ message: 'Server error during login' });
@@ -80,7 +78,6 @@ const loginUser = async (req, res) => {
 
 const logoutUser = async (req, res) => {
     try {
-        console.log(req.user);
         await User.findByIdAndUpdate(req.user._id, { activeStatus: false });
         res.clearCookie('token', {
             httpOnly: true,
@@ -89,7 +86,6 @@ const logoutUser = async (req, res) => {
         });
 
         res.status(200).json({ message: 'Logout successful' });
-        console.log('User logged out successfully');
     } catch (error) {
         console.error('Error during logout:', error);
         res.status(500).json({ message: 'Server error during logout' });
