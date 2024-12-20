@@ -11,6 +11,7 @@ import connectToDb from './src/connections/db.js';
 import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 import authenticate from './src/middlewares/authorization.js';
+import handleSocketEvents from './src/sockets/socketHandlers.js';
 
 dotenv.config({
     path:'./.env'
@@ -46,13 +47,9 @@ const io = new Server(server, {
     }
 });
 
-// Socket.IO event handling
-io.on('connection', (socket) => {
-    socket.on('disconnect', () => {
-    });
-});
+// Socket.IO events handle
+handleSocketEvents(io);
 
-// Start the server
 server.listen(PORT, () => {
     connectToDb();
     console.log(`Server is running on http://localhost:${PORT}`);
