@@ -26,7 +26,7 @@ app.use(cookieParser());
 app.use(morgan('dev'));
 
 app.use(cors({
-    origin: `${process.env.FRONT_URL}`,
+    origin: process.env.FRONT_URL,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'OPTIONS', 'DELETE'], 
     credentials: true 
 }));
@@ -41,7 +41,7 @@ app.use('/api/groups', authenticate, groupRoutes);
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: `${process.env.FRONT_URL}`,
+        origin: process.env.FRONT_URL,
         methods: ['GET', 'POST', 'PUT', 'PATCH', 'OPTIONS', 'DELETE'],
         credentials: true
     }
