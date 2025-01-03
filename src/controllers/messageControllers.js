@@ -5,7 +5,8 @@ import User from '../models/userModel.js';
 // Send Message to User
 const sendMessage = async (req, res) => {
     try {
-        const { targetUser, targetGroupId, text } = req.body;
+        const { targetUser, targetGroupId, texts } = req.body;
+
         if (targetUser && targetGroupId) {
             return res.status(400).json({ message: 'Both targetUser and targetGroup cannot be sent at the same time.' });
         }
@@ -13,6 +14,7 @@ const sendMessage = async (req, res) => {
             return res.status(400).json({ message: 'Either targetUser or targetGroup is required.' });
         }
         const user = req.user;
+
         if (targetUser) {
             const receiver = await User.findById(targetUser);
             if (!receiver) {
@@ -25,22 +27,11 @@ const sendMessage = async (req, res) => {
             if (!chat || !chat.messages) {
                 return res.status(404).json({ message: 'Chat does not exist.' });
             }
-            const updatedMessage = await Message.findByIdAndUpdate(
+            await Message.findByIdAndUpdate(
                 chat.messages,
-                {
-                    $push: {
-                        text: {
-                            content: text,
-                            sender: user._id,
-                            sentAt: Date.now(),
-                        },
-                    },
-                },
+                { text: texts },
                 { new: true }
             );
-            if (!updatedMessage) {
-                return res.status(500).json({ message: 'Failed to update messages.' });
-            }
         } else {
             const group = await Group.findById(targetGroupId);
             if (!group) {
@@ -49,17 +40,12 @@ const sendMessage = async (req, res) => {
             if (!group.members.includes(user._id)) {
                 return res.status(400).json({ message: 'User is not a member of this group.' });
             }
-            await Message.findByIdAndUpdate(group.messages,{
-                $push:{
-                    text:{
-                        content:text,
-                        sender:user._id,
-                        sentAt: Date.now(),
-                    }
-                }
-            });
+            await Message.findByIdAndUpdate(
+                group.messages,
+                { text: texts }, // Replace with texts directly
+                { new: true }
+            );
         }
-
         return res.status(201).json({ message: 'Message sent successfully.' });
     } catch (error) {
         console.error('Error while sending message:', error);
