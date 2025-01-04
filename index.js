@@ -11,6 +11,7 @@ import connectToDb from './src/connections/db.js';
 import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 import authenticate from './src/middlewares/authorization.js';
+import handleSocketEvents from './src/sockets/socketHandlers.js';
 
 dotenv.config({
     path:'./.env'
@@ -25,7 +26,7 @@ app.use(cookieParser());
 app.use(morgan('dev'));
 
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: process.env.FRONT_URL,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'OPTIONS', 'DELETE'], 
     credentials: true 
 }));
@@ -40,19 +41,15 @@ app.use('/api/groups', authenticate, groupRoutes);
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: 'http://localhost:5173',
+        origin: process.env.FRONT_URL,
         methods: ['GET', 'POST', 'PUT', 'PATCH', 'OPTIONS', 'DELETE'],
         credentials: true
     }
 });
 
-// Socket.IO event handling
-io.on('connection', (socket) => {
-    socket.on('disconnect', () => {
-    });
-});
+// Socket.IO events handle
+handleSocketEvents(io);
 
-// Start the server
 server.listen(PORT, () => {
     connectToDb();
     console.log(`Server is running on http://localhost:${PORT}`);
