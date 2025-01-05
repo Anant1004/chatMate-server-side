@@ -28,6 +28,7 @@ const sendMessage = async (req, res) => {
                 return res.status(404).json({ message: 'Chat does not exist.' });
             }
             await Message.findByIdAndUpdate(
+                chat.messages,
                 {
                     $push: {
                         text: {
