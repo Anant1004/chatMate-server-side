@@ -5,7 +5,7 @@ import User from '../models/userModel.js';
 // Send Message to User
 const sendMessage = async (req, res) => {
     try {
-        const { targetUser, targetGroupId, texts } = req.body;
+        const { targetUser, targetGroupId, text } = req.body;
 
         if (targetUser && targetGroupId) {
             return res.status(400).json({ message: 'Both targetUser and targetGroup cannot be sent at the same time.' });
@@ -29,7 +29,15 @@ const sendMessage = async (req, res) => {
             }
             await Message.findByIdAndUpdate(
                 chat.messages,
-                { text: texts },
+                {
+                    $push: {
+                        text: {
+                            content: text,
+                            sender: user._id,
+                            sentAt: Date.now(),
+                        },
+                    },
+                },
                 { new: true }
             );
         } else {
@@ -42,7 +50,15 @@ const sendMessage = async (req, res) => {
             }
             await Message.findByIdAndUpdate(
                 group.messages,
-                { text: texts }, // Replace with texts directly
+                {
+                    $push: {
+                        text: {
+                            content: text,
+                            sender: user._id,
+                            sentAt: Date.now(),
+                        },
+                    },
+                },
                 { new: true }
             );
         }
