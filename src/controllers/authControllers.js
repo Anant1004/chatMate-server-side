@@ -53,28 +53,30 @@ const loginUser = async (req, res) => {
         }
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
-            return res.status(400).json({ message: 'Wrong credentials' });
+            return res.status(400).json({ message: 'Invalid email or password' });
         }
         const token = jwt.sign(
             { userId: user._id, email: user.email },
             process.env.JWT_SECRET,
             { expiresIn: '5h' }
         );
+
         res.cookie('token', token, {
             httpOnly: true,
-            secure: true,
-            maxAge: 24 * 60 * 60 * 1000,
+            secure: process.env.NODE_ENV === 'production', // Secure only in production
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // None for cross-origin, Lax for local
+            maxAge: 24 * 60 * 60 * 1000, // 1 day
         });
-        const loggedInUser = await User.findById(user._id).select("-password");
         res.status(200).json({
             message: 'Log-in successful',
-            user: loggedInUser
+            user:user,
         });
     } catch (error) {
         console.error('Error during login:', error);
         res.status(500).json({ message: 'Server error during login' });
     }
 };
+
 
 
 const logoutUser = async (req, res) => {
@@ -117,7 +119,7 @@ const getCurrentUser = async (req, res) => {
         console.error('Error fetching current user:', error);
         res.status(500).json({ message: 'Server error fetching current user' });
     }
-}; 
+};
 
 const getUserById = async (req, res) => {
     try {
@@ -139,7 +141,7 @@ const updateAvatar = async (req, res) => {
             return res.status(400).send({ message: "Avatar is missing." });
         }
         const result = await uploadOnCloudinary(req.file.path);
-        if(!result.url){
+        if (!result.url) {
             return res.status(400).json({ message: 'Error uploading to cloudinary' });
         }
         await User.findByIdAndUpdate(req.user._id, { avatar: result.url });
@@ -158,5 +160,5 @@ export {
     getCurrentUser,
     getUserById,
     updateAvatar,
- 
+
 };
