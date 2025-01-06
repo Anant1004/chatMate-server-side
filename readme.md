@@ -16,6 +16,7 @@ A full-stack chatting application built with the MERN (MongoDB, Express, React, 
 - **Frontend**: React, Axios
 - **Backend**: Node.js, Express, MongoDB, Mongoose
 - **Authentication**: JWT (JSON Web Token) for session management, bcrypt for password hashing
+- **Cloud Storage**: Multer and Cloudinary 
 
 ## Prerequisites
 
@@ -92,6 +93,10 @@ A full-stack chatting application built with the MERN (MongoDB, Express, React, 
 ### Group Chats
 - `POST /api/groups/create`: Create a new group chat.
 - `POST /api/groups/add-member`: Add a member to an existing group.
+
+### Upload profile Pic
+- `POST /api/auth/updateAvatar`: Upload a new Profile Picture.
+
 
 ## Folder Structure
 

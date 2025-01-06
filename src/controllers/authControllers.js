@@ -62,7 +62,8 @@ const loginUser = async (req, res) => {
         );
         res.cookie('token', token, {
             httpOnly: true,
-            secure: true
+            secure: true,
+            maxAge: 24 * 60 * 60 * 1000,
         });
         const loggedInUser = await User.findById(user._id).select("-password");
         res.status(200).json({
