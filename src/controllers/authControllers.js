@@ -61,7 +61,8 @@ const loginUser = async (req, res) => {
             { expiresIn: '5h' }
         );
         res.cookie('token', token, {
-            httpOnly: true,
+            httpOnly: false,
+            
             secure: true
         });
         const loggedInUser = await User.findById(user._id).select("-password");
