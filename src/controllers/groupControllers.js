@@ -5,8 +5,8 @@ import User from '../models/userModel.js';
 // Create Group
 const createGroup = async (req, res) => {
     try {
-        const { name, members } = req.body;
-        if(!name || !members){
+        const { name, members, description } = req.body;
+        if(!name || !members ){
             return res.status(400).json({ message: 'Name and members are required.' });
         }
         if(!Array.isArray(members)){
@@ -16,7 +16,7 @@ const createGroup = async (req, res) => {
         if(!members.includes(req.user._id)){
             members.push(req.user._id);
         }
-        const group = await Group.create({ name, members, createdBy: req.user._id,messages: newChat._id });
+        const group = await Group.create({ name, members,description, createdBy: req.user._id,messages: newChat._id });
         res.status(201).json(group);
     } catch (error) {
         res.status(500).json({ error: error.message });
