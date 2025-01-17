@@ -9,7 +9,7 @@ A full-stack chatting application built with the MERN (MongoDB, Express, React, 
 - **Real-Time Messaging**: Real-time one-on-one and group messaging.
 - **Active Status**: Shows online/offline status for users.
 - **Group Chats**: Users can create group chats with multiple friends.
-- **Message Read Receipts**: Indicates whether messages are seen or read.
+- **Message Read Receipts**: Indicates whether messages are seen or read. 
 
 ## Tech Stack
 
