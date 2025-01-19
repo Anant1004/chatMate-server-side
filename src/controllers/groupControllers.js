@@ -6,17 +6,17 @@ import User from '../models/userModel.js';
 const createGroup = async (req, res) => {
     try {
         const { name, members, description } = req.body;
-        if(!name || !members ){
+        if (!name || !members) {
             return res.status(400).json({ message: 'Name and members are required.' });
         }
-        if(!Array.isArray(members)){
+        if (!Array.isArray(members)) {
             return res.status(400).json({ message: 'Members should be an array of users.' });
         }
-        const newChat = await Message.create({text:[]});
-        if(!members.includes(req.user._id)){
+        const newChat = await Message.create({ text: [] });
+        if (!members.includes(req.user._id)) {
             members.push(req.user._id);
         }
-        const group = await Group.create({ name, members,description, createdBy: req.user._id,messages: newChat._id });
+        const group = await Group.create({ name, members, description, createdBy: req.user._id, messages: newChat._id });
         res.status(201).json(group);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -37,19 +37,19 @@ const getGroupDetails = async (req, res) => {
 
 const addSingleMemberToGroup = async (req, res) => {
     try {
-        const { memberId,groupId } = req.body;
-        if(!memberId){
+        const { memberId, groupId } = req.body;
+        if (!memberId) {
             return res.status(400).json({ message: 'Member ID is required.' });
         }
         const group = await Group.findById(groupId);
-        if(!group){
+        if (!group) {
             return res.status(400).json({ message: `Group with ID ${groupId} does not exist.` });
         }
-        const member=await User.findById(memberId);
-        if(!member){
+        const member = await User.findById(memberId);
+        if (!member) {
             return res.status(400).json({ message: `User with ID ${memberId} does not exist.` });
         }
-        if(group.members.includes(member._id)){
+        if (group.members.includes(member._id)) {
             return res.status(400).json({ message: 'User is already a member of the group.' });
         }
         group.members.push(member._id);
@@ -64,24 +64,24 @@ const addSingleMemberToGroup = async (req, res) => {
 
 const removeSingleMemberFromGroup = async (req, res) => {
     try {
-        const { memberId,groupId } = req.body;
-        if(!memberId){
+        const { memberId, groupId } = req.body;
+        if (!memberId) {
             return res.status(400).json({ message: 'Member ID is required.' });
         }
         const group = await Group.findById(groupId);
-        if(!group){
+        if (!group) {
             return res.status(400).json({ message: `Group does not exist.` });
         }
-        const member=await User.findById(memberId);
-        if(!member){
+        const member = await User.findById(memberId);
+        if (!member) {
             return res.status(400).json({ message: `User does not exist.` });
         }
-        if(!group.members.includes(memberId)){
+        if (!group.members.includes(memberId)) {
             return res.status(400).json({ message: 'User is not a member of the group.' });
         }
-        group.members = group.members.filter(id => id.toString()!== memberId.toString());
+        group.members = group.members.filter(id => id.toString() !== memberId.toString());
         await group.save();
-        res.status(200).json({ message:'member removed successfully'});
+        res.status(200).json({ message: 'member removed successfully' });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -92,11 +92,11 @@ const removeSingleMemberFromGroup = async (req, res) => {
 const updateGroup = async (req, res) => {
     try {
         const { groupId, newName } = req.body;
-        if(!newName){
+        if (!newName) {
             return res.status(400).json({ message: 'New group name is required.' });
         }
         const group = await Group.findByIdAndUpdate(groupId, { name: newName }, { new: true });
-        if(!group){
+        if (!group) {
             return res.status(400).json({ message: `Group does not exist.` });
         }
         res.status(200).json(group);
@@ -110,11 +110,11 @@ const updateGroup = async (req, res) => {
 const deleteGroup = async (req, res) => {
     try {
         const { groupId } = req.body;
-        if(!groupId){
+        if (!groupId) {
             return res.status(400).json({ message: 'Group ID is required.' });
         }
         const group = await Group.findByIdAndDelete(groupId);
-        if(!group){
+        if (!group) {
             return res.status(400).json({ message: `Group does not exist.` });
         }
         await Message.findByIdAndDelete(group.messages);
@@ -124,6 +124,34 @@ const deleteGroup = async (req, res) => {
     }
 }
 
+const getAllGroups = async (req, res) => {
+    try {
+        const groups = await Group.find();
+        console.log(groups);
+        res.status(200).json(groups);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+const getUserGroups=async(req,res)=>{
+    try {
+        const groups = await Group.find({$or:[{members:{$in:[req.user._id]}}]});
+        res.status(200).json(groups);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+const getGroupCreatedByUser = async (req, res) => {
+    try {
+        const groups = await Group.find({$or:[{createdBy:req.user._id}]});
+        res.status(200).json(groups);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
 export {
     createGroup,
     getGroupDetails,
@@ -131,4 +159,7 @@ export {
     removeSingleMemberFromGroup,
     updateGroup,
     deleteGroup,
-}
+    getAllGroups,
+    getUserGroups,
+    getGroupCreatedByUser,
+ };
