@@ -19,6 +19,6 @@ router.patch('/updateGroup', updateGroup);
 router.delete('/delteGroup', deleteGroup);
 router.get('/getAllGroups', getAllGroups);
 router.get('/getUserGroups', getUserGroups);
-router.get('/getGroupCreatedByUser', getGroupCreatedByUser);
+router.get('/getGroupCreatedByUser', getGroupCreatedByUser); 
 
 export default router;
