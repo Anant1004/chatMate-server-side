@@ -102,21 +102,40 @@ A full-stack chatting application built with the MERN (MongoDB, Express, React, 
 
 ```plaintext
 mern-chat-app/
-├── client/         # React frontend
-│   ├── src/
-│   ├── public/
-│   ├── package.json
-│   └── .env
-├── server/         # Node.js backend
-│   ├── models/     # Mongoose schemas
-│   ├── routes/     # API endpoints
-│   ├── controllers/# Route handlers
-│   ├── middleware/ # Middleware for auth
-│   ├── utils/      # Utility functions
-│   ├── .env
-│   └── server.js
-├── README.md
-└── .gitignore
+Directory structure:
+└── anant1004-chatmate-server-side/
+    ├── readme.md
+    ├── index.js
+    ├── package.json
+    ├── pnpm-lock.yaml
+    ├── public/
+    │   └── temp/
+    │       └── .gitkeep
+    └── src/
+        ├── connections/
+        │   └── db.js
+        ├── controllers/
+        │   ├── authControllers.js
+        │   ├── friendscontrollers.js
+        │   ├── groupControllers.js
+        │   └── messageControllers.js
+        ├── middlewares/
+        │   ├── authorization.js
+        │   └── multer.js
+        ├── models/
+        │   ├── groupModel.js
+        │   ├── messageModel.js
+        │   └── userModel.js
+        ├── routes/
+        │   ├── authRoutes.js
+        │   ├── friendsRoutes.js
+        │   ├── groupRoutes.js
+        │   └── messageRoutes.js
+        ├── sockets/
+        │   └── socketHandlers.js
+        └── utils/
+            └── cloudinary.js
+
 ```
 
 ## Security
