@@ -8,11 +8,11 @@ const signupUser = async (req, res) => {
     try {
         const { fullName, userName, email, password, avatar } = req.body;
         if (!fullName || !userName || !email || !password) {
-            return res.status(400).json({ message: 'All fields are required.' });
+            return res.status(400).json({ code: 'MISSING_FIELDS', message: 'All fields are required.' });
         }
         const existingUser = await User.findOne({ $or: [{ email }, { userName }] });
         if (existingUser) {
-            return res.status(400).json({ message: 'User already exists.' });
+            return res.status(409).json({ code: 'USER_ALREADY_EXISTS', message: 'User already exists.' });
         }
         const hashedPassword = await bcrypt.hash(password, 12);
         const newUser = new User({
@@ -21,7 +21,6 @@ const signupUser = async (req, res) => {
             email,
             password: hashedPassword,
             avatar,
-            activeStatus: false,
             friends: []
         });
         await newUser.save();
@@ -31,13 +30,12 @@ const signupUser = async (req, res) => {
             userName: newUser.userName,
             email: newUser.email,
             avatar: newUser.avatar,
-            status: newUser.activeStatus,
             friends: newUser.friends
         });
 
     } catch (error) {
         console.error('Error sign-up:', error);
-        res.status(500).json({ message: 'Server error sign-up' });
+        res.status(500).json({ code: 'SERVER_ERROR', message: 'Server error sign-up' });
     }
 };
 
@@ -45,15 +43,15 @@ const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
         if (!email || !password) {
-            return res.status(400).json({ message: 'All fields are required.' });
+            return res.status(400).json({ code: 'MISSING_FIELDS', message: 'All fields are required.' });
         }
         const user = await User.findOne({ email });
         if (!user) {
-            return res.status(400).json({ message: 'Invalid email or password' });
+            return res.status(401).json({ code: 'USER_NOT_FOUND', message: 'Invalid email or password' });
         }
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
-            return res.status(400).json({ message: 'Invalid email or password' });
+            return res.status(400).json({ code: 'INVALID_PASSWORD', message: 'Invalid email or password' });
         }
         const token = jwt.sign(
             { userId: user._id, email: user.email },
@@ -63,41 +61,45 @@ const loginUser = async (req, res) => {
 
         res.cookie('token', token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production', // Secure only in production
-            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // None for cross-origin, Lax for local
-            maxAge: 24 * 60 * 60 * 1000, // 1 day
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+            maxAge: 24 * 60 * 60 * 1000,
         });
         res.status(200).json({
+            code: 'LOGIN_SUCCESS',
             message: 'Log-in successful',
             user:user,
         });
     } catch (error) {
         console.error('Error during login:', error);
-        res.status(500).json({ message: 'Server error during login' });
+        res.status(500).json({ code: 'SERVER_ERROR', message: 'Server error during login' });
     }
 };
 
 
 
 const logoutUser = async (req, res) => {
+    const token = req.cookies?.token;
+        if (!token) {
+            return res.status(204).json({ code:'NOT_TOKEN', message: 'Already logeed out' });
+        }
     try {
-        await User.findByIdAndUpdate(req.user._id, { activeStatus: false });
         res.clearCookie('token', {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
         });
 
-        res.status(200).json({ message: 'Logout successful' });
+        res.status(200).json({ code:'SUCESS_LOGOUT', message: 'Logout successful' });
     } catch (error) {
         console.error('Error during logout:', error);
-        res.status(500).json({ message: 'Server error during logout' });
+        res.status(500).json({ code: 'SERVER_ERROR', message: 'Server error during logout' });
     }
 };
 
 const getAllUsersExceptLoggedIn = async (req, res) => {
     try {
-        const users = await User.find({ _id: { $ne: req.user._id } }).select("-password"); // added the $ne for excluding the loggedin user 
+        const users = await User.find({ _id: { $ne: req.user._id } }).select("-password");
         if (!users || users.length === 0) {
             return res.status(404).json({ message: 'No users found' });
         }
@@ -138,16 +140,16 @@ const getUserById = async (req, res) => {
 const updateAvatar = async (req, res) => {
     try {
         if (!req?.file.path) {
-            return res.status(400).send({ message: "Avatar is missing." });
+            return res.status(422).send({ code: 'AVATAR_MISSING', message: "Avatar is missing." });
         }
         const result = await uploadOnCloudinary(req.file.path);
         if (!result.url) {
-            return res.status(400).json({ message: 'Error uploading to cloudinary' });
+            return res.status(502).json({code: 'UPLOAD_FAILED', message: 'Error uploading to cloudinary' });
         }
         await User.findByIdAndUpdate(req.user._id, { avatar: result.url });
-        res.status(200).send({ message: "File uploaded successfully", url: result.url });
+        res.status(200).send({ code: 'UPLOAD_SUCCESS', message: "File uploaded successfully", url: result.url });
     } catch (error) {
-        res.status(500).send({ message: "Error uploading file", error: error.message });
+        res.status(500).send({ code: 'SERVER_ERROR', message: "Error uploading file", error: error.message });
     }
 };
 
