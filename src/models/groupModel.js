@@ -7,7 +7,8 @@ const GroupSchema = new mongoose.Schema({
     required: true
   },
   avatar: {
-    type: String
+    type: String,
+    default: 'https://picsum.photos/200'
   },
   description:{
     type: String
