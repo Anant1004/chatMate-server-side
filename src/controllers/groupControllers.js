@@ -12,6 +12,9 @@ const createGroup = async (req, res) => {
         if (!Array.isArray(members)) {
             return res.status(400).json({ message: 'Members should be an array of users.' });
         }
+        if (members.length < 2) {
+            return res.status(400).json({ message: 'At least two members are required.' });
+        }
         const newChat = await Message.create({ text: [] });
         if (!members.includes(req.user._id)) {
             members.push(req.user._id);

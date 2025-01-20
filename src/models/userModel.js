@@ -27,16 +27,12 @@ const UserSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
   }],
-  activeStatus: {
-    type: Boolean,
-    default: false
-  },
   friendRequests: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
   }],
   chats:[{
-    chatWith:{      // store username 
+    chatWith:{
       type: String,
       required: true
     },
