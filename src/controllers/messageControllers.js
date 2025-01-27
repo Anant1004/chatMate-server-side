@@ -99,7 +99,7 @@ const getGroupMessages = async (req, res) => {
             return res.status(400).json({ message: 'User is not a member of this group.' });
         }
         const messages = await Message.find(group.messages);
-        res.status(200).json(messages.text);
+        res.status(200).json(messages[0].text);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
