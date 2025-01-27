@@ -23,6 +23,8 @@ const handleSocketEvents = (io) => {
             io.to(onlineUsers[payload.to]).emit('message', payload);
         })
 
+        socket.on("groupMessage",(payload)=>io.emit('groupMessage', payload));
+
         // Handle user disconnection
         socket.on('disconnect', () => {
             console.log(`A user disconnected: ${socket.id}`);
